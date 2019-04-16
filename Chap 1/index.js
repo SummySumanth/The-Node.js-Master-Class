@@ -8,6 +8,7 @@ Primary file for API
 // Dependencies
 const http = require('http');
 const url = require('url');
+const StringDecoder = require('string_decoder').StringDecoder;
 
 // The server should respond to all requests with a string
 const server = http.createServer((req, res) =>{
@@ -28,16 +29,29 @@ const server = http.createServer((req, res) =>{
     // Get the Headers as an object
     const headers = req.headers;
 
-    // Send the response
-    res.end('Hello world\n');
+    // Get the payloads if there are any
+    var decoder = new StringDecoder('utf-8');
+    var buffer = '';
+    req.on('data', (data)=>{
+        buffer += decoder.write(data);
+    });
 
-    // Log the request path
-    
-    console.log('Path:\t\t', trimmedPath);
-    console.log('Method: \t', method);
-    console.log('Query String \t', queryStringObject);
-    console.log('Headers:\n', headers);
-    console.log('--------\n\n');
+    req.on('end', () =>{
+        buffer += decoder.end();
+        
+        // Send the response
+        res.end('Hello world\n');
+
+        // Log the request path
+
+        console.log('\nPath:\t\t', trimmedPath);
+        console.log('Method: \t', method);
+        console.log('Query String \t', queryStringObject);
+        console.log('Headers:\n', headers);
+        console.log('Payload:\n', buffer);
+        console.log('--------\n\n');
+    });
+
 });
 
 // Start the server, and have it listen on port 3000
