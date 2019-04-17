@@ -56,6 +56,7 @@ const server = http.createServer((req, res) =>{
             var payloadString = JSON.stringify(payload);
 
             // return the response
+            res.setHeader('Content-Type','application/json');
             res.writeHead(statusCode);
             res.end(payloadString); 
             
@@ -68,12 +69,12 @@ const server = http.createServer((req, res) =>{
 
         // Log the request path
         
-        console.log('\nPath:\t\t', trimmedPath);
-        console.log('Method: \t', method);
-        console.log('Query String \t', queryStringObject);
-        console.log('Headers:\n', headers);
-        console.log('Payload:\n', buffer);
-        console.log('--------\n\n');
+        // console.log('\nPath:\t\t', trimmedPath);
+        // console.log('Method: \t', method);
+        // console.log('Query String \t', queryStringObject);
+        // console.log('Headers:\n', headers);
+        // console.log('Payload:\n', buffer);
+        // console.log('--------\n\n');
     });
 
 });
