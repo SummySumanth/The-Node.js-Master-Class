@@ -7,6 +7,32 @@ const url = require('url');
 const StringDecoder = require('string_decoder').StringDecoder;
 const config = require('./config');
 const fs = require('fs');
+const _data = require('./lib/data');
+
+// TESTING
+// @TODO delete this file
+
+// Create a file
+// _data.create('test', 'newFile', {'foo': 'bar'}, err => console.log('error ! - ', err));
+
+//  Read a file
+// _data.read('test', 'newFile' , (err, data) => {
+//   if(!err){
+//     console.log('data is ', data);
+//   } else {
+//     console.log('error is ', err);
+//   }
+// });
+
+// Update the existing file
+// _data.update('test', 'newFile', { fizz: 'buzzz'}, err => {
+//   console.log('This was the error', err);
+// });
+
+// Deleting the file
+// _data.delete('test', 'newFile', err => {
+//   console.log('Error: ', err);
+// })
 
 // Instantiating the HTTP server
 const httpServer = http.createServer((req, res) => {
@@ -103,10 +129,9 @@ var unifiedServer = (req, res) => {
 // Define the Handlers
 var handlers = {};
 
-//Sample handler
-handlers.sample = (data , callback) => {
-  // Callback a http status code and a payload object
-  callback(406, { 'name': 'sample handler'});
+// Ping handler
+handlers.ping = (data, callback) => {
+  callback(200);
 }
 
 // Not found handler
