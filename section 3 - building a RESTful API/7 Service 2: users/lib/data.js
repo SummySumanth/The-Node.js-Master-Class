@@ -5,6 +5,7 @@
 // Dependencies
 var fs = require('fs');
 var path = require('path');
+const helpers = require('./helpers');
 
 // Container for the module (to be exported)
 var lib = {};
@@ -32,11 +33,9 @@ lib.create = (dir, file, data, callback) => {
           })
         } else {
           callback('Error writing to the file');
-
         }
       })
     } else {
-      console.log('error at lib - ', err);
       callback('Could not create new file, it may already exist');
     }
   });
@@ -45,7 +44,12 @@ lib.create = (dir, file, data, callback) => {
 // Read data from a file
 lib.read = (dir, file, callback) => {
   fs.readFile(lib.baseDir+dir+'/'+file+'.json','utf8', (err, data) => {
-    callback(err, data)
+    if(!err && data) {
+      let parsedData = helpers.parseJsonToObject(data);
+      callback(false, parsedData);
+    } else {
+      callback(err, data)
+    }
   })
 };
 

@@ -8,6 +8,8 @@ const StringDecoder = require('string_decoder').StringDecoder;
 const config = require('./config');
 const fs = require('fs');
 const _data = require('./lib/data');
+const handlers = require('./lib/handlers');
+const helpers = require('./lib/helpers');
 
 // TESTING
 // @TODO delete this file
@@ -71,7 +73,7 @@ var unifiedServer = (req, res) => {
  let method = req.method.toLowerCase();
 
  // Get the query string as an object
- let querysStringObject = parsedUrl.query;
+ let queryStringObject = parsedUrl.query;
 
  // Get the headers as an object
  let headers = req.headers;
@@ -89,20 +91,24 @@ var unifiedServer = (req, res) => {
    buffer += decoder.end();
 
    console.clear();
+    console.log('trimmed path is ', trimmedPath);
    // Choose the handler this request should go to. If one is not found, use the notFound handler
    var chosenHandler = typeof(router[trimmedPath]) !== 'undefined' ? router[trimmedPath] : handlers.notFound;
 
    // Construct the data object to send to the handler
    let data = {
      trimmedPath,
-     querysStringObject,
+     queryStringObject,
      method,
      headers,
-     payload: buffer
+     payload: helpers.parseJsonToObject(buffer)
    };
+
+   console.log('data is ', data);
 
    // Route the request to the handelr specified in the router
    chosenHandler(data, (statusCode, payload) => {
+     console.log('HANDLER CALLED ONCE !!!!!!!!');
      // Use the status code called back by the handler, or default status code 200
      statusCode = typeof(statusCode) == 'number' ? statusCode : 200;
 
@@ -112,6 +118,7 @@ var unifiedServer = (req, res) => {
      // Cpmvert the pauload to a string
      let payloadString = JSON.stringify(payload);
 
+     console.log('Setting header now ####', payload);
      // Return the response
      res.setHeader('Content-Type', 'application/json');
      res.writeHead(statusCode);      
@@ -122,25 +129,13 @@ var unifiedServer = (req, res) => {
  });
 
  // log the request
- console.log('Request received on this path ', trimmedPath , ' with this method ', method, 'and had these query params ', querysStringObject);
+ console.log('Request received on this path ', trimmedPath , ' with this method ', method, 'and had these query params ', queryStringObject);
  console.log('Request headers are ', headers);
-}
-
-// Define the Handlers
-var handlers = {};
-
-// Ping handler
-handlers.ping = (data, callback) => {
-  callback(200);
-}
-
-// Not found handler
-handlers.notFound = (data, callback) => {
-  callback(404);
 }
 
 // Define a request router
 var router = {
   'sample': handlers.sample,
   'ping': handlers.ping,
+  'users': handlers.users,
 }
